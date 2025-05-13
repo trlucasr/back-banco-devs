@@ -45,4 +45,9 @@ async def create_cliente(body: Cliente):
     #     nome_cliente, telefone, email, cgc, ativo, created_at, user_inc
     # )
 
+    # return db.query(
+    #     query=query,
+    #     autoCommit=True,
+    # )
+
 #    return {"result": body}
