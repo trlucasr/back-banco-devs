@@ -5,7 +5,7 @@ from db import Database
 from datetime import date, time
 
 router = APIRouter()
-db = Database()
+db = Database() 
 
 class TransferenciaPost(BaseModel):
     id: int = None
