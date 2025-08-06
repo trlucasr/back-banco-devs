@@ -37,6 +37,20 @@ def validaRequest(body, endpoint):
             body.id = 0
             return {"status": 4001, "mensagem": "id não deve ser enviado na requisição."}
 
+        # # verifico se o id da conta existe no banco         
+        # query=f"SELECT id_conta FROM saldo WHERE id_conta = {body.id_conta};"
+
+        # result = db.query(
+        #     query=query,
+        #     autoCommit=True,
+        # )
+
+        # print(result)
+        # return {"status": 4005, "mensagem": "OK"}
+
+        # if result[0][0] > 0:
+        #     return {"status": 4003, "mensagem": "ja existe saldo cadastrado para essa conta."}        
+
     if endpoint == "alterar_saldo":
         if body["id"] is None or body["id"] == 0:
             body["id"] = 0
@@ -45,7 +59,7 @@ def validaRequest(body, endpoint):
     return {"status": 2000, "mensagem": "OK"}
 
 
-@router.post("/Saldo/", tags=["Saldo"])
+@router.post("/saldo/", tags=["Saldos"])
 async def criar_Saldo(body: SaldoPost):
 
     """
@@ -83,8 +97,8 @@ async def criar_Saldo(body: SaldoPost):
 
     return {"result": result}
 
-@router.get("/saldo/", tags=["Saldo"])
-async def buscar_saldo(id: Optional[int] = None):
+@router.get("/saldo/", tags=["Saldos"])
+async def buscar_saldo(id_conta: Optional[int] = None):
 
     """
     Busca um ou todos as saldo.
@@ -95,22 +109,22 @@ async def buscar_saldo(id: Optional[int] = None):
     Returns:
     - dict: Resultado da query.
     """
-    if id is None:
-        return db.query(query=f"SELECT * FROM saldo;")
+    if id_conta is None or id_conta <= 0 :
+        return {"status": 4004, "mensagem": "id_conta está inválido ou nulo, não é possível executar essa requisição."}
     else:
-        return db.query(query=f"SELECT * FROM saldo WHERE id = {id};")
+        return db.query(query=f"SELECT * FROM saldo WHERE id_conta = {id_conta};")
 
-@router.delete("/saldo/", tags=["Saldo"])
-async def deletar_saldo(id: int):
+@router.delete("/saldo/", tags=["Saldos"])
+async def deletar_saldo(id_conta: int):
     """
     Deleta uma saldo.
 
     Args:
     - id (int): ID da Saldo a ser deletado.
     """
-    return db.query(query=f"DELETE FROM saldo WHERE id = {id};", autoCommit=True)
+    return db.query(query=f"DELETE FROM saldo WHERE id_conta = {id_conta};", autoCommit=True)
 
-@router.put("/saldo/", tags=["Saldo"])
+@router.put("/saldo/", tags=["Saldos"])
 async def atualizar_saldo(body: SaldoPut):
 
     """
@@ -133,7 +147,7 @@ async def atualizar_saldo(body: SaldoPut):
     if r_valid["status"] > 4000:
         return {"status": r_valid["status"], "mensagem": r_valid["mensagem"]}
 
-    query = """UPDATE saldos SET """
+    query = """UPDATE saldo SET """
 
     if body.get("valor"):
         query += "valor = {}, ".format(body["valor"])
